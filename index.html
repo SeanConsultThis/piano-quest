@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piano Quest 🎹</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🎹</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="skin-classic">
+
+<div id="file-warning" class="warning-banner" style="display:none">
+  ⚠️ The microphone only works when the app is served from a local server.
+  Double-click <b>Start Piano Quest.command</b> in the PianoTrainer folder instead of opening this file directly.
+</div>
+
+<header class="topbar">
+  <div class="logo">🎹 Piano<span>Quest</span></div>
+  <button class="nav-btn" data-nav="home">Home</button>
+  <button class="nav-btn" data-nav="learn">Learn</button>
+  <button class="nav-btn" data-nav="songs">Songs</button>
+  <button class="nav-btn" data-nav="store">Store</button>
+  <button class="nav-btn" data-nav="add">＋ Add Song</button>
+  <button class="nav-btn" data-nav="settings">⚙️</button>
+  <div class="hud">
+    <span>🪙 <b id="hud-coins">0</b></span>
+    <span>⭐ <b id="hud-stars">0</b></span>
+    <span id="hud-sync" title="Cloud sync" style="display:none">☁️</span>
+  </div>
+</header>
+
+<!-- ================= HOME ================= -->
+<section class="screen" id="screen-home">
+  <div class="home-hero">
+    <div class="big-emoji">🎹</div>
+    <h1 id="home-name">Welcome to Piano Quest!</h1>
+    <p class="subtitle">Play real piano. Earn coins. Unlock awesome stuff.</p>
+    <div id="home-stats"></div>
+    <button class="btn primary big" id="home-next">▶ Start</button>
+  </div>
+  <div class="card howto" style="display:block">
+    <h3>How it works 🎵</h3>
+    <ol>
+      <li><b>Allow the microphone</b> when asked — the app listens to your real piano and hears every note you play.</li>
+      <li>Start in <b>Learn</b> to find the keys, then move on to <b>Songs</b>.</li>
+      <li>Every correct note earns points. Finish songs to collect <b>🪙 coins</b> and <b>⭐ stars</b>.</li>
+      <li>Spend coins in the <b>Store</b> on piano skins, powerups, and new songs!</li>
+      <li>Grown-ups: add any song with <b>＋ Add Song</b> (sheet music, MIDI, or typed-in notes).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= LEARN ================= -->
+<section class="screen" id="screen-learn">
+  <h1>📚 Lessons</h1>
+  <p class="subtitle">Finish a lesson to unlock the next one. Each pays out bonus coins the first time!</p>
+  <div id="lesson-list"></div>
+</section>
+
+<!-- ================= SONGS ================= -->
+<section class="screen" id="screen-songs">
+  <h1>🎵 Song Library</h1>
+  <p class="subtitle">Earn coins to unlock new songs. Three stars means a perfect performance!</p>
+  <div id="song-list"></div>
+</section>
+
+<!-- ================= PLAY ================= -->
+<section class="screen" id="screen-play">
+  <div class="play-header">
+    <h1 id="play-title">–</h1>
+    <div id="play-powerups"></div>
+    <button class="btn" id="btn-demo">▶ Listen</button>
+    <button class="btn" id="btn-tapmode">Switch to Tap</button>
+    <button class="btn subtle" id="btn-exit-play">✕ Exit</button>
+  </div>
+  <div class="play-stats">
+    <span class="pill">Score: <b id="play-score">0</b></span>
+    <span class="pill">🔥 Streak: <b id="play-streak">0</b></span>
+    <span class="pill">Note <b id="play-count">–</b></span>
+    <span class="pill" id="mic-status">🎤</span>
+    <span class="pill">I hear: <b id="play-heard">–</b></span>
+  </div>
+  <div class="progress-track"><div id="play-progress"></div></div>
+  <p id="play-intro" style="display:none"></p>
+  <div id="big-letter" style="display:none"></div>
+  <div id="staff-holder"></div>
+  <div class="kb-scroll" id="kb-holder"></div>
+
+  <div class="modal" id="results-modal">
+    <div class="modal-box">
+      <h2>🎉 Finished!</h2>
+      <div id="res-stars">⭐⭐⭐</div>
+      <div class="res-grid">
+        <div><b id="res-accuracy">–</b>accuracy</div>
+        <div><b id="res-score">–</b>score</div>
+        <div><b id="res-streak">–</b>best streak</div>
+      </div>
+      <div id="res-coins">+0 🪙</div>
+      <div id="res-bonus"></div>
+      <div class="modal-actions">
+        <button class="btn primary" id="btn-replay">↻ Play Again</button>
+        <button class="btn" id="btn-res-exit">Done</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STORE ================= -->
+<section class="screen" id="screen-store">
+  <h1>🛍️ Reward Store</h1>
+  <p class="subtitle">Spend your hard-earned coins!</p>
+  <h2 class="cat-title">🎨 Piano Skins</h2>
+  <div id="store-skins"></div>
+  <h2 class="cat-title">⚡ Powerups</h2>
+  <div id="store-powerups"></div>
+  <h2 class="cat-title">🎵 Songs</h2>
+  <p class="muted">New songs are unlocked right in the <b>Songs</b> tab — look for the 🔒.</p>
+</section>
+
+<!-- ================= ADD SONG ================= -->
+<section class="screen" id="screen-add">
+  <h1>＋ Add Your Own Songs</h1>
+  <p class="subtitle">Three ways to add any song you like. Added songs appear under “My Songs”.</p>
+
+  <div class="add-tabs">
+    <button class="add-tab active" data-tab="sheet">📄 Sheet Music (MusicXML)</button>
+    <button class="add-tab" data-tab="midi">🎛️ MIDI File</button>
+    <button class="add-tab" data-tab="text">⌨️ Type It In</button>
+  </div>
+
+  <div class="add-panel active" id="add-panel-sheet">
+    <h3>Upload sheet music (MusicXML)</h3>
+    <p>MusicXML is the standard digital sheet-music format. Where to get it:</p>
+    <ul>
+      <li><b>MuseScore</b> (free app, musescore.org): open any score, then <i>File → Export → MusicXML → Uncompressed (*.musicxml)</i>.</li>
+      <li><b>musescore.com</b> has thousands of free arrangements you can download.</li>
+      <li>Scanning apps like <b>PlayScore 2</b> can photograph paper sheet music and export MusicXML.</li>
+    </ul>
+    <p>The app reads the <b>melody line</b> (first part, top notes).</p>
+    <p style="margin-top:10px"><button class="btn primary" onclick="document.getElementById('file-input').click()">📄 Choose a .musicxml / .xml file</button></p>
+  </div>
+
+  <div class="add-panel" id="add-panel-midi">
+    <h3>Upload a MIDI file (.mid)</h3>
+    <p>MIDI files are everywhere — search for “<i>song name</i> midi” online, or export from GarageBand, Synthesia, or any keyboard app. The app picks the busiest track as the melody and keeps the highest note when chords are played.</p>
+    <p style="margin-top:10px"><button class="btn primary" onclick="document.getElementById('file-input').click()">🎛️ Choose a .mid / .midi file</button></p>
+  </div>
+
+  <div class="add-panel" id="add-panel-text">
+    <h3>Type a melody in</h3>
+    <p>Write notes separated by spaces. Each note is a letter + octave (Middle C is <code>C4</code>):</p>
+    <ul>
+      <li><code>C4</code> — one beat &nbsp;•&nbsp; <code>G4:2</code> — held 2 beats &nbsp;•&nbsp; <code>F#4</code> — sharp, <code>Bb3</code> — flat</li>
+      <li><code>R:1</code> — a rest &nbsp;•&nbsp; <code>C4:1(Twin-)</code> — with a lyric &nbsp;•&nbsp; <code>|</code> bar lines are ignored</li>
+    </ul>
+    <input type="text" id="text-title" placeholder="Song title" style="width:100%">
+    <textarea id="text-input" placeholder="C4(Twin-) C4(kle) G4(twin-) G4(kle) A4(lit-) A4(tle) G4:2(star)"></textarea>
+    <button class="btn primary" id="btn-parse-text">Preview Melody</button>
+  </div>
+
+  <div id="add-error"></div>
+
+  <div id="add-preview" style="display:none">
+    <h3>Preview</h3>
+    <div class="preview-row">
+      <input type="text" id="preview-title" placeholder="Title">
+      <span class="muted" id="preview-info"></span>
+      <button class="btn" id="btn-preview-listen">▶ Listen</button>
+      <button class="btn primary" id="btn-save-import">💾 Save to My Songs</button>
+    </div>
+    <div id="preview-staff"></div>
+  </div>
+
+  <input type="file" id="file-input" accept=".musicxml,.xml,.mid,.midi,.mxl" style="display:none">
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section class="screen" id="screen-settings">
+  <h1>⚙️ Settings</h1>
+
+  <div class="settings-group">
+    <h3>🎤 Microphone Test</h3>
+    <p class="muted">Play single notes on your piano and check that the right note appears. Tips: a quiet room, the computer close to the piano, and one clear note at a time.</p>
+    <div class="tuner">
+      <div id="tuner-note">–</div>
+      <div id="tuner-cents"></div>
+      <div class="level-track"><div id="tuner-level"></div></div>
+      <button class="btn primary" id="btn-mictest">🎤 Start Mic Test</button>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <h3>☁️ Cloud Sync</h3>
+    <p class="muted" id="sync-explain">Save progress to the cloud and play on any device. Enter the same family code and name on each device.</p>
+    <div class="sync-form" id="sync-form">
+      <input type="text" id="sync-code" placeholder="Family code (make one up, e.g. mcmillan-piano)">
+      <input type="text" id="sync-name" placeholder="Player name">
+      <button class="btn primary" id="btn-sync-connect">☁️ Connect</button>
+    </div>
+    <div class="sync-connected" id="sync-connected" style="display:none">
+      <p>Connected as <b id="sync-who">–</b></p>
+      <button class="btn subtle" id="btn-sync-disconnect">Disconnect this device</button>
+    </div>
+    <p id="sync-status" class="muted"></p>
+  </div>
+
+  <div class="settings-group">
+    <h3>🎮 Gameplay</h3>
+    <div class="setting-row">
+      <label>Player name<span class="hint">Shown on the home screen</span></label>
+      <input type="text" id="set-name" placeholder="Your name">
+    </div>
+    <div class="setting-row">
+      <label>Show key hints<span class="hint">The next key glows on the screen keyboard (always on in lessons)</span></label>
+      <input type="checkbox" id="set-hints">
+    </div>
+    <div class="setting-row">
+      <label>Letter names on keys<span class="hint">Show C, D, E… on the on-screen keyboard</span></label>
+      <input type="checkbox" id="set-keylabels">
+    </div>
+    <div class="setting-row">
+      <label>Letter names under the staff<span class="hint">Turn off for a note-reading challenge</span></label>
+      <input type="checkbox" id="set-stafflabels">
+    </div>
+    <div class="setting-row">
+      <label>Strict octave mode<span class="hint">Off (recommended): playing the right key in any octave counts. On: must be the exact octave.</span></label>
+      <input type="checkbox" id="set-strict">
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <h3>🧹 Danger Zone</h3>
+    <button class="btn" id="btn-reset">Reset all progress</button>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/synth.js"></script>
+<script src="js/pitch.js"></script>
+<script src="js/staff.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/state.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/parsers.js"></script>
+<script src="js/songs.js"></script>
+<script src="js/lessons.js"></script>
+<script src="js/store.js"></script>
+<script src="js/game.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
