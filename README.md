@@ -4,16 +4,33 @@ A piano-learning game that **listens through the microphone** and hears which ke
 is pressed on a real (acoustic or digital) piano. Correct notes earn coins and
 stars to spend in the Reward Store on piano skins, powerups, and new songs.
 
-## Starting the app
+## Playing the game
 
-**Double-click `Start Piano Quest.command`** in this folder. It starts a tiny
-local web server and opens the app in your browser.
+**🌐 Live site (any device): <https://seanconsultthis.github.io/piano-quest/>**
 
-> Why a server? Browsers only allow microphone access on secure pages —
-> `http://localhost` counts, but opening `index.html` directly does not.
+Hosted on GitHub Pages from this repo (`SeanConsultThis/piano-quest`). HTTPS
+means the microphone works on laptops, iPads, and phones. To deploy changes:
 
-Manual alternative: `python3 -m http.server 8742` in this folder, then open
-<http://localhost:8742>. Chrome is recommended.
+```sh
+git add -A && git commit -m "update" && git push
+```
+
+The site refreshes about a minute after each push.
+
+**Local alternative:** double-click `Start Piano Quest.command` in this
+folder — it serves the app at `http://localhost:8742`. (Browsers only allow
+mic access on secure pages — `localhost` counts, opening `index.html`
+directly does not.)
+
+## Cross-device progress (cloud sync)
+
+Progress saves to the browser automatically; with cloud sync it follows her
+to any device. One-time setup: **[SETUP-FIREBASE.md](SETUP-FIREBASE.md)**
+(free Firebase project, ~10 min), paste the config into
+`js/firebase-config.js`, push. Then on each device:
+**⚙️ Settings → Cloud Sync → family code + name → Connect.**
+The ☁️ in the top bar means progress is safe. If two devices play offline,
+the most recently played one wins.
 
 ## First-time setup
 
